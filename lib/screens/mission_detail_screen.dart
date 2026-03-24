@@ -31,8 +31,28 @@ class MissionDetailScreen extends StatelessWidget {
             tooltip: 'View Clues & Hints',
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const ClueTrackerScreen(),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const ClueTrackerScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        final offsetTween = Tween<Offset>(
+                          begin: const Offset(0.0, 1.0),
+                          end: Offset.zero,
+                        ).chain(CurveTween(curve: Curves.easeOut));
+                        final opacityTween = Tween<double>(
+                          begin: 0.0,
+                          end: 1.0,
+                        ).chain(CurveTween(curve: Curves.easeIn));
+
+                        return SlideTransition(
+                          position: animation.drive(offsetTween),
+                          child: FadeTransition(
+                            opacity: animation.drive(opacityTween),
+                            child: child,
+                          ),
+                        );
+                      },
                 ),
               );
             },
@@ -46,24 +66,20 @@ class MissionDetailScreen extends StatelessWidget {
           children: [
             // Difficulty badge
             Chip(
-              avatar: Icon(
-                _difficultyIcon(mission.difficulty),
-                size: 18,
-              ),
+              avatar: Icon(_difficultyIcon(mission.difficulty), size: 18),
               label: Text(
                 mission.difficulty.toUpperCase(),
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              backgroundColor:
-                  _difficultyColor(mission.difficulty, colorScheme),
+              backgroundColor: _difficultyColor(
+                mission.difficulty,
+                colorScheme,
+              ),
             ),
             const SizedBox(height: 16),
 
             // Description
-            Text(
-              mission.description,
-              style: theme.textTheme.bodyLarge,
-            ),
+            Text(mission.description, style: theme.textTheme.bodyLarge),
             const SizedBox(height: 24),
 
             // Story intro card
@@ -78,8 +94,10 @@ class MissionDetailScreen extends StatelessWidget {
                     color: colorScheme.secondaryContainer,
                     child: Row(
                       children: [
-                        Icon(Icons.auto_stories,
-                            color: colorScheme.onSecondaryContainer),
+                        Icon(
+                          Icons.auto_stories,
+                          color: colorScheme.onSecondaryContainer,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Story Introduction',
@@ -123,9 +141,7 @@ class MissionDetailScreen extends StatelessWidget {
                 return Card(
                   child: ListTile(
                     leading: Icon(
-                      session.isComplete
-                          ? Icons.check_circle
-                          : Icons.timelapse,
+                      session.isComplete ? Icons.check_circle : Icons.timelapse,
                       color: session.isComplete
                           ? Colors.green
                           : colorScheme.outline,
@@ -178,8 +194,28 @@ class MissionDetailScreen extends StatelessWidget {
     if (!context.mounted) return;
 
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const PuzzleScreen(),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const PuzzleScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final offsetTween = Tween<Offset>(
+            begin: const Offset(0.0, 1.0),
+            end: Offset.zero,
+          ).chain(CurveTween(curve: Curves.easeOut));
+          final opacityTween = Tween<double>(
+            begin: 0.0,
+            end: 1.0,
+          ).chain(CurveTween(curve: Curves.easeIn));
+
+          return SlideTransition(
+            position: animation.drive(offsetTween),
+            child: FadeTransition(
+              opacity: animation.drive(opacityTween),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }

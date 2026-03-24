@@ -33,10 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentTab,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentTab, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentTab,
         onDestinationSelected: (index) {
@@ -91,9 +88,13 @@ class _MissionsViewState extends State<_MissionsView> {
     var missions = gameProvider.missions;
     if (_searchQuery.isNotEmpty) {
       missions = missions
-          .where((m) =>
-              m.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              m.description.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (m) =>
+                m.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                m.description.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
           .toList();
     }
     if (_difficultyFilter != 'all') {
@@ -105,7 +106,25 @@ class _MissionsViewState extends State<_MissionsView> {
     return CustomScrollView(
       slivers: [
         SliverAppBar.large(
-          title: const Text('StoryPath'),
+          title: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colorScheme.primaryContainer,
+                ),
+                child: Icon(
+                  Icons.auto_stories,
+                  size: 20,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text('StoryPath'),
+            ],
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
@@ -126,7 +145,9 @@ class _MissionsViewState extends State<_MissionsView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                fillColor: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.4,
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -176,9 +197,7 @@ class _MissionsViewState extends State<_MissionsView> {
           ),
         ),
         // Stats summary bar
-        SliverToBoxAdapter(
-          child: _StatsBar(stats: gameProvider.stats),
-        ),
+        SliverToBoxAdapter(child: _StatsBar(stats: gameProvider.stats)),
         // Section header
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -238,8 +257,28 @@ class _MissionsViewState extends State<_MissionsView> {
     gameProvider.selectMission(mission);
 
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => MissionDetailScreen(mission: mission),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            MissionDetailScreen(mission: mission),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final offsetTween = Tween<Offset>(
+            begin: const Offset(0.0, 1.0),
+            end: Offset.zero,
+          ).chain(CurveTween(curve: Curves.easeOut));
+          final opacityTween = Tween<double>(
+            begin: 0.0,
+            end: 1.0,
+          ).chain(CurveTween(curve: Curves.easeIn));
+
+          return SlideTransition(
+            position: animation.drive(offsetTween),
+            child: FadeTransition(
+              opacity: animation.drive(opacityTween),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }

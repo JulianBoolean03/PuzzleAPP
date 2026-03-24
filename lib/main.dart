@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'providers/game_provider.dart';
 import 'providers/theme_provider.dart';
@@ -9,6 +12,12 @@ import 'services/preferences_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database factory for web
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+  }
+
   final prefs = await SharedPreferences.getInstance();
   final prefsService = PreferencesService(prefs);
 
@@ -51,9 +60,9 @@ class StoryPathApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(themeProvider.fontScale),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(themeProvider.fontScale)),
           child: child!,
         );
       },
