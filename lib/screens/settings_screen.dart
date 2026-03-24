@@ -21,6 +21,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late int _hintDelay;
   late bool _timerEnabled;
   late bool _soundEnabled;
+  late String _displayName;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _hintDelay = prefs.hintDelaySeconds;
     _timerEnabled = prefs.timerEnabled;
     _soundEnabled = prefs.soundEnabled;
+    _displayName = prefs.displayName;
   }
 
   @override
@@ -41,9 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return CustomScrollView(
       slivers: [
-        SliverAppBar.large(
-          title: const Text('Settings'),
-        ),
+        SliverAppBar.large(title: const Text('Settings')),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -61,8 +61,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       themeProvider.themeMode == ThemeMode.dark
                           ? Icons.dark_mode
                           : themeProvider.themeMode == ThemeMode.light
-                              ? Icons.light_mode
-                              : Icons.brightness_auto,
+                          ? Icons.light_mode
+                          : Icons.brightness_auto,
                     ),
                     title: const Text('Theme'),
                     subtitle: Text(_themeModeLabel(themeProvider.themeMode)),
@@ -101,10 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             const Icon(Icons.text_fields),
                             const SizedBox(width: 12),
-                            Text(
-                              'Font Size',
-                              style: theme.textTheme.bodyLarge,
-                            ),
+                            Text('Font Size', style: theme.textTheme.bodyLarge),
                             const Spacer(),
                             Text(
                               '${(themeProvider.fontScale * 100).round()}%',
@@ -136,6 +133,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 8),
+
+                // Display name
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.person),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Display Name',
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: TextEditingController(text: _displayName),
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your display name',
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (value) {
+                            _displayName = value;
+                          },
+                          onSubmitted: (value) {
+                            prefs.setDisplayName(value);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
 
                 // ── Gameplay ──
@@ -158,7 +192,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       items: const [
                         DropdownMenuItem(value: 'easy', child: Text('Easy')),
-                        DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                        DropdownMenuItem(
+                          value: 'medium',
+                          child: Text('Medium'),
+                        ),
                         DropdownMenuItem(value: 'hard', child: Text('Hard')),
                       ],
                     ),
@@ -235,7 +272,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: SwitchListTile(
                     secondary: const Icon(Icons.volume_up),
                     title: const Text('Sound Effects'),
-                    subtitle: const Text('Play sounds for correct/wrong answers'),
+                    subtitle: const Text(
+                      'Play sounds for correct/wrong answers',
+                    ),
                     value: _soundEnabled,
                     onChanged: (value) {
                       setState(() => _soundEnabled = value);
@@ -312,14 +351,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final path = await ExportService().exportData();
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Exported to: $path')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Exported to: $path')));
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Export failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
     }
   }
 
@@ -362,9 +401,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Import failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
     }
   }
 

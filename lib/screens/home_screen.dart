@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/mission.dart';
 import '../providers/game_provider.dart';
+import '../services/preferences_service.dart';
 import '../widgets/mission_card.dart';
 import 'mission_detail_screen.dart';
 import 'leaderboard_screen.dart';
@@ -106,24 +107,37 @@ class _MissionsViewState extends State<_MissionsView> {
     return CustomScrollView(
       slivers: [
         SliverAppBar.large(
-          title: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colorScheme.primaryContainer,
+          title: Consumer<PreferencesService>(
+            builder: (context, prefs, child) => Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.primaryContainer,
+                  ),
+                  child: Icon(
+                    Icons.auto_stories,
+                    size: 20,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                 ),
-                child: Icon(
-                  Icons.auto_stories,
-                  size: 20,
-                  color: colorScheme.onPrimaryContainer,
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('StoryPath'),
+                    Text(
+                      'Welcome, ${prefs.displayName}!',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 10),
-              const Text('StoryPath'),
-            ],
+              ],
+            ),
           ),
           actions: [
             IconButton(

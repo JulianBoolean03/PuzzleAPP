@@ -12,6 +12,7 @@ class PreferencesService {
   static const _keyTimerEnabled = 'timer_enabled';
   static const _keyLastMissionPlayed = 'last_mission_played';
   static const _keySoundEnabled = 'sound_enabled';
+  static const _keyDisplayName = 'display_name';
 
   final SharedPreferences _prefs;
 
@@ -51,4 +52,9 @@ class PreferencesService {
   bool get soundEnabled => _prefs.getBool(_keySoundEnabled) ?? true;
   Future<bool> setSoundEnabled(bool value) =>
       _prefs.setBool(_keySoundEnabled, value);
+
+  // Display name for the player
+  String get displayName => _prefs.getString(_keyDisplayName) ?? 'Player';
+  Future<bool> setDisplayName(String value) =>
+      _prefs.setString(_keyDisplayName, value);
 }
